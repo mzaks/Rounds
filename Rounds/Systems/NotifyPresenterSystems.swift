@@ -143,26 +143,32 @@ final class SetButtonLabelsSystem: ReactiveSystem {
 
 
 final class InitValuePresentersSystem: ReactiveSystem {
-    let collector = appContext.collector(for: Matcher(any: [RoundPresenterComponent.cid, OnTimePresenterComponent.cid, OffTimePresenterComponent.cid, InitTimePresenterComponent.cid]))
+    let collector = appContext.collector(for:
+        Matcher(any: [
+            RoundPresenterComponent.cid,
+            OnTimePresenterComponent.cid,
+            OffTimePresenterComponent.cid,
+            InitTimePresenterComponent.cid
+        ]))
     
     func execute(entities: Set<Entity>) {
         entities.withEach { (_, c: RoundPresenterComponent) in
-            if let rounds = ctx.uniqueComponent(NumberOfRoundsComponent.self)?.value {
+            if let rounds = MainContext.numberOfRounds {
                 c.ref?.renderRounds(value: rounds)
             }
         }
         entities.withEach { (_, c: OnTimePresenterComponent) in
-            if let time = ctx.uniqueComponent(OnTimeComponent.self)?.value {
+            if let time = MainContext.onTime {
                 c.ref?.render(onTime: time)
             }
         }
         entities.withEach { (_, c: OffTimePresenterComponent) in
-            if let time = ctx.uniqueComponent(OffTimeComponent.self)?.value {
+            if let time = MainContext.offTime {
                 c.ref?.render(offTime: time)
             }
         }
         entities.withEach { (_, c: InitTimePresenterComponent) in
-            if let time = ctx.uniqueComponent(InitTimeComponent.self)?.value {
+            if let time = MainContext.initTime {
                 c.ref?.render(initTime: time)
             }
         }

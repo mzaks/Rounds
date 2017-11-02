@@ -17,12 +17,10 @@ let minInitTime = 0
 private let initTimeStep = 1
 
 final class GreenButtonPressedSystem: ReactiveSystem {
-    let name = "Green button pressed"
-    
     let collector = ctx.collector(for: GreenButtonPressedComponent.matcher, type: .addedOrUpdated)
     
     func execute(entities: Set<Entity>) {
-        guard let appState = ctx.uniqueComponent(AppStateComponent.self)?.value else {
+        guard let appState = MainContext.appState else {
             return
         }
         switch appState {
@@ -49,7 +47,7 @@ final class RedButtonPressedSystem: ReactiveSystem {
     let collector = ctx.collector(for: RedButtonPressedComponent.matcher, type: .addedOrUpdated)
     
     func execute(entities: Set<Entity>) {
-        guard let appState = ctx.uniqueComponent(AppStateComponent.self)?.value else {
+        guard let appState = MainContext.appState else {
             return
         }
         switch appState {
@@ -74,9 +72,9 @@ final class RemoveRoundsIfPresent: ReactiveSystem {
     let presenters = appContext.all([RoundPresenterComponent.cid])
     
     func execute(entities: Set<Entity>) {
-        if let state = ctx.uniqueComponent(AppStateComponent.self)?.value, state.isSelectionState {
+        if let state = MainContext.appState, state.isSelectionState {
             if rounds.isEmpty == false {
-                if let roundsNumber = ctx.uniqueComponent(NumberOfRoundsComponent.self)?.value {
+                if let roundsNumber = MainContext.numberOfRounds {
                     presenters.withEach { (_, c: RoundPresenterComponent) in
                         c.ref?.renderRounds(value: roundsNumber)
                     }
@@ -91,37 +89,37 @@ final class RemoveRoundsIfPresent: ReactiveSystem {
 }
 
 func addRounds(value: Int, lowerBound: Int = minNumberOfRounds) {
-    let prevValue = ctx.uniqueComponent(NumberOfRoundsComponent.self)?.value ?? 0
+    let prevValue = MainContext.numberOfRounds ?? 0
     let newValue = max(lowerBound, prevValue + value)
-    ctx.setUniqueComponent(NumberOfRoundsComponent(value: newValue))
+    MainContext.numberOfRounds = newValue
 }
 
 func addOnTime(value: Int, lowerBound: Int = minOnTime) {
-    let prevValue = ctx.uniqueComponent(OnTimeComponent.self)?.value ?? 0
+    let prevValue = MainContext.onTime ?? 0
     let newValue = max(lowerBound, prevValue + value)
-    ctx.setUniqueComponent(OnTimeComponent(value: newValue))
+    MainContext.onTime = newValue
 }
 
 func addOffTime(value: Int, lowerBound: Int = minOffTime) {
-    let prevValue = ctx.uniqueComponent(OffTimeComponent.self)?.value ?? 0
+    let prevValue = MainContext.offTime ?? 0
     let newValue = max(lowerBound, prevValue + value)
-    ctx.setUniqueComponent(OffTimeComponent(value: newValue))
+    MainContext.offTime = newValue
 }
 
 func addInitTime(value: Int, lowerBound: Int = minInitTime) {
-    let prevValue = ctx.uniqueComponent(InitTimeComponent.self)?.value ?? 0
+    let prevValue = MainContext.initTime ?? 0
     let newValue = max(lowerBound, prevValue + value)
-    ctx.setUniqueComponent(InitTimeComponent(value: newValue))
+    MainContext.initTime = newValue
 }
 
 func startTimer() {
     ctx.setUniqueComponent(AppStateComponent(value: .running))
-    if let initTime = ctx.uniqueComponent(InitTimeComponent.self)?.value, initTime > 0 {
+    if let initTime = MainContext.initTime, initTime > 0 {
         let e = ctx.createEntity()
         e += RoundTypeComponent(value: .setup)
         e += RoundProgressComponent(value: 0)
     }
-    guard let rounds = ctx.uniqueComponent(NumberOfRoundsComponent.self)?.value, rounds > 0 else {
+    guard let rounds = MainContext.numberOfRounds, rounds > 0 else {
         return
     }
     
@@ -136,17 +134,17 @@ func startTimer() {
 }
 
 func pauseTimer() {
-    ctx.setUniqueComponent(AppStateComponent(value: .paused))
+    MainContext.appState = .paused
 }
 
 func continueTimer() {
-    ctx.setUniqueComponent(AppStateComponent(value: .running))
+    MainContext.appState = .running
 }
 
 func resetValues() {
     AppContext.pagesPresenter?.showFirstPage()
     InitValuesSystem().initialise()
-    ctx.setUniqueComponent(AppStateComponent(value: .selectRounds))
+    MainContext.appState = .selectRounds
     for e in ctx.group(RoundTypeComponent.matcher) {
         e.destroy()
     }

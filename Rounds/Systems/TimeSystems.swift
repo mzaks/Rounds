@@ -26,7 +26,7 @@ final class ComputeDeltaTimeSystem: ExecuteSystem, InitSystem {
 final class SetRoundProgressSystem: ReactiveSystem {
     let collector = ctx.collector(for: DeltaTimeComponent.matcher, type: .addedOrUpdated)
     func execute(entities: Set<Entity>) {
-        guard ctx.uniqueComponent(AppStateComponent.self)?.value == .running,
+        guard MainContext.appState == .running,
             let e = ctx.uniqueEntity(CurrentRoundComponent.matcher),
             let delta = ctx.uniqueComponent(DeltaTimeComponent.self)?.value else {
             return
@@ -40,13 +40,13 @@ final class SwitchRoundsSystem: ReactiveSystem {
     let collector = ctx.collector(for: RoundProgressComponent.matcher, type: .addedOrUpdated)
     
     func execute(entities: Set<Entity>) {
-        guard ctx.uniqueComponent(AppStateComponent.self)?.value == .running,
+        guard MainContext.appState == .running,
             entities.count == 1,
             let e = entities.first,
             let type = e.get(RoundTypeComponent.self)?.value,
-            let initTime = ctx.uniqueComponent(InitTimeComponent.self)?.value,
-            let onTime = ctx.uniqueComponent(OnTimeComponent.self)?.value,
-            let offTime = ctx.uniqueComponent(OffTimeComponent.self)?.value else {
+            let initTime = MainContext.initTime,
+            let onTime = MainContext.onTime,
+            let offTime = MainContext.offTime else {
                 return
         }
         let progress = e.get(RoundProgressComponent.self)?.value ?? 0
