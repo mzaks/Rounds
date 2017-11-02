@@ -1,6 +1,0 @@
-language: objective-c
-osx_image: xcode9
-script:
-  - xcodebuild test -project Rounds.xcodeproj -scheme Rounds ONLY_ACTIVE_ARCH=NO
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
