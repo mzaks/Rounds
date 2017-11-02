@@ -1,0 +1,4 @@
+framework module EntitasKit {
+    header "EntitasKit-Swift.h"
+    requires objc
+}

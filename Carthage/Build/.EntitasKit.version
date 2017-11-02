@@ -1,0 +1,21 @@
+{
+  "iOS" : [
+    {
+      "hash" : "8bacef02683c6f329c34ae98b06f76106d1c40a678eb9da579d7638cd33fa0cf",
+      "name" : "EntitasKit"
+    }
+  ],
+  "commitish" : "1.1.0",
+  "watchOS" : [
+
+  ],
+  "tvOS" : [
+
+  ],
+  "Mac" : [
+    {
+      "hash" : "d5b4ac1bb5512a24bcd043063f900dd06dd5650013bf04c86d23d5d2d1f04710",
+      "name" : "EntitasKit"
+    }
+  ]
+}
